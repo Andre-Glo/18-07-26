@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Programma - Glo e Andre si sposano</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    /* Stili per i bottoni travel */
+    .travel-options {
+      max-width: 900px;
+      margin: 2rem auto 0;
+      width: 100%;
+      min-width: 0;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .travel-scroll-hint {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      margin: 0 0 0.75rem;
+      font-size: 0.88rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      color: #6f614c;
+      text-transform: uppercase;
+    }
+
+    .travel-scroll-hint::after {
+      content: '→';
+      font-size: 1rem;
+    }
+
+    .travel-carousel {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      scroll-snap-type: x mandatory;
+      padding: 0 12px 12px 0;
+      cursor: grab;
+      scrollbar-width: thin;
+      scrollbar-color: #b69973 rgba(182, 153, 115, 0.18);
+      mask-image: linear-gradient(to right, transparent 0, black 18px, black calc(100% - 28px), transparent 100%);
+    }
+
+    .travel-carousel::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    .travel-carousel::-webkit-scrollbar-track {
+      background: rgba(182, 153, 115, 0.18);
+      border-radius: 999px;
+    }
+
+    .travel-carousel::-webkit-scrollbar-thumb {
+      background: #b69973;
+      border-radius: 999px;
+    }
+
+    .travel-carousel:active {
+      cursor: grabbing;
+    }
+
+    .travel-cards {
+      display: flex;
+      flex-wrap: nowrap;
+      width: max-content;
+      gap: 16px;
+      padding: 10px 0;
+      min-width: 0;
+    }
+
+    .content-text,
+    .details {
+      min-width: 0;
+      max-width: 100%;
+    }
+
+    .travel-btn {
+      width: 160px;
+      height: 160px;
+      flex-shrink: 0;
+      background: #e2d9c2;
+      border: 1px solid #ffffff00;
+      border-radius: 18px;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      cursor: pointer;
+      padding: 10px;
+      scroll-snap-align: start;
+      color: #6f614c;
+      -webkit-text-fill-color: #6f614c;
+      -webkit-appearance: none;
+      appearance: none;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform 0.2s ease;
+    }
+
+    .travel-btn,
+    .travel-btn:active,
+    .travel-btn:focus,
+    .travel-btn:visited,
+    .travel-btn span {
+      color: #6f614c;
+      -webkit-text-fill-color: #6f614c;
+    }
+
+    .travel-btn:hover {
+      transform: translateY(-3px);
+    }
+
+    .travel-card-title {
+      font-weight: 700;
+    }
+
+    .travel-card-subtitle {
+      font-size: 0.9rem;
+    }
+
+    .travel-card-cta {
+      font-size: 0.8rem;
+      margin-top: 6px;
+      letter-spacing: 0.05em;
+    }
+
+    .travel-location-list {
+      margin: 0 0 1rem 1.2rem;
+      padding: 0;
+    }
+
+    .travel-location-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.55rem;
+      margin-bottom: 0.45rem;
+      list-style: none;
+    }
+
+    .travel-location-icon {
+      width: 16px;
+      height: 16px;
+      object-fit: contain;
+      margin-top: 0.2rem;
+      flex-shrink: 0;
+    }
+
+    .travel-location-text {
+      color: #4f4333;
+      line-height: 1.6;
+    }
+
+    .travel-location-link,
+    .travel-location-link:visited,
+    .travel-location-link:active {
+      color: #6f614c;
+      font-weight: 700;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(111, 97, 76, 0.45);
+    }
+
+    .travel-location-link:hover,
+    .travel-location-link:focus-visible {
+      color: #3f3427;
+      border-bottom-color: currentColor;
+    }
+
+    .travel-title-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 0.35rem;
+    }
+
+    .travel-title-image {
+      width: min(320px, 90%);
+      height: auto;
+      display: block;
+    }
+
+    .content-text,
+    .details,
+    .travel-btn,
+    .popup-content,
+    .transport-option,
+    .transport-option p,
+    .transport-option h4 {
+      font-family: 'Yu Gothic Light', sans-serif;
+    }
+
+    /* Stili per i popup */
+    .travel-popup {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .travel-popup.show {
+      display: flex;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .popup-content {
+      background: #fff;
+      border-radius: 12px;
+      padding: 2rem;
+      max-width: 600px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      animation: slideIn 0.3s ease;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      background: none;
+      border: none;
+      font-size: 2rem;
+      cursor: pointer;
+      color: #666;
+      transition: color 0.2s ease;
+    }
+
+    .close-btn:hover {
+      color: #000;
+    }
+
+    .popup-content h3 {
+      margin-bottom: 1.5rem;
+      color: #333;
+      border-bottom: 2px solid #000;
+      padding-bottom: 0.5rem;
+    }
+
+    .transport-option {
+      margin: 1.5rem 0;
+      padding: 1rem;
+      background: #f9f9f9;
+      border-radius: 8px;
+    }
+
+    .transport-option h4 {
+      margin-bottom: 0.8rem;
+      color: #333;
+    }
+
+    .transport-option p {
+      line-height: 1.6;
+      color: #666;
+    }
+
+    .secret-popup-content {
+      max-width: 520px;
+      padding: 0.9rem;
+      background: #fffaf2;
+    }
+
+    .secret-popup-image {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 8px;
+    }
+
+    .secret-tap-target {
+      touch-action: manipulation;
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 1024px) {
+      .content-row {
+        grid-template-columns: 1fr !important;
+        gap: 2rem !important;
+      }
+
+      .content-text,
+      .details,
+      .travel-options {
+        width: 100%;
+        max-width: 100%;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .travel-title-image {
+        width: min(260px, 85vw);
+      }
+
+      .travel-scroll-hint {
+        font-size: 0.8rem;
+      }
+
+      .popup-content {
+        padding: 1.5rem;
+        margin: 10px;
+      }
+    }
+  </style>
+</head>
+
+<body class="secondary-page">
+
+  <!-- Hamburger Menu -->
+  <div class="hamburger-menu" id="hamburger">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+
+  <!-- Menu Navigazione -->
+  <nav class="page-nav" id="pageNav">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="programma.html" class="nav-link">Programma</a>
+    <a href="lista-nozze.html" class="nav-link">Lista nozze - FAQ</a>
+  </nav>
+
+
+  <main class="program-main">
+
+    <div class="program-title-wrap">
+      <img src="assets/title.png" alt="La giornata" class="program-title-image" />
+    </div>
+
+    <section class="page-content program-page-content">
+
+      <!-- Sezione Cerimonia -->
+      <section class="program-section" style="margin: 40px;">
+        <div class="program-item" style="text-align: center;">
+          <div class="program-image" style="display: flex; justify-content: center; margin-bottom: 20px;">
+            <img src="assets/sanpietro.png" alt="Cerimonia" class="section-icon"
+              style="width: 250px; height: 250px; object-fit: cover; border-radius: 8px;">
+          </div>
+          <div class="program-content" style="max-width: 400px; margin: 0 auto;">
+            <h2 style="font-family: 'Lato', sans-serif; font-weight: 700;">Cerimonia</h2>
+            <h3 style="font-family: 'Lato', sans-serif; font-weight: 300;">Duomo di San Pietro</h3>
+            <p style="font-family: 'Yu Gothic Light', sans-serif;">Modica è la città dalle 100 chiese, ma non preoccupatevi, ne abbiamo scelta solo una! Si dice che salire quegli scalini sia il primo test
+              di resistenza per il matrimonio... noi siamo pronti
+              alla scalata, e voi?!</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sezione Post Cerimonia -->
+      <section class="program-section" style="margin: 40px;">
+        <div class="program-item" style="text-align: center;">
+          <div class="program-image" style="display: flex; justify-content: center; margin-bottom: 20px;">
+            <img src="assets/gisana.png" alt="Post Cerimonia" class="section-icon"
+              style="width: 250px; height: 250px; object-fit: cover; border-radius: 8px;">
+          </div>
+          <div class="program-content" style="max-width: 400px; margin: 0 auto;">
+            <h2 style="font-family: 'Lato', sans-serif; font-weight: 700;">Ricevimento</h2>
+            <h3 style="font-family: 'Lato', sans-serif; font-weight: 300;">Villa Gisana</h3>
+            <p style="font-family: 'Yu Gothic Light', sans-serif;">Villa Gisana è una splendida dimora storica del XVIII
+              secolo, situata nelle campagne di Modica. <br> Preparatevi a ballare, brindare e festeggiare con noi fino a tardi! (e ovviamente anche a
+              mangiare, altrimenti che matrimonio in Sicilia è?)</p>
+          </div>
+        </div>
+      </section>
+
+
+      <section class="program-section" style="margin: 40px;">
+        <div class="program-item" style="text-align: center;">
+          <div class="program-image" style="display: flex; justify-content: center; margin-bottom: 20px;">
+            <img src="assets/dress.png" alt="Post Cerimonia" class="section-icon secret-tap-target"
+              id="dressCodeImage"
+              style="width: 250px; height: 250px; object-fit: cover; border-radius: 8px;">
+          </div>
+          <div class="program-content" style="max-width: 400px; margin: 0 auto;">
+            <h2 id="dressCodeTitle" class="secret-tap-target" style="font-family: 'Lato', sans-serif; font-weight: 700;">Dress Code</h2>
+            <h3 id="dressCodeSubtitle" class="secret-tap-target" style="font-family: 'Lato', sans-serif; font-weight: 300;">Colori e allegria</h3>
+            <p style="font-family: 'Yu Gothic Light', sans-serif;">Niente bianco e nero! Vi vogliamo belli colorati e brillanti. Abbigliamento "leggero" e niente tacchi sottili.</p>
+          </div>
+        </div>
+      </section>
+
+
+    </section>
+
+  </main>
+
+  <!-- Sezione Gallery -->
+  <section class="gallery-section" style="background-color: #dacfb9; padding: 40px 20px;">
+    <div
+      style="display: flex; justify-content: space-between; align-items: center; gap: 30px; max-width: 1200px; margin: 0 auto;">
+      <img src="assets/timeline.png" alt="Timeline matrimonio"
+        style="max-width: 48%; height: auto; border-radius: 10px;">
+      <img src="assets/IMG_6473.jpg" alt="Foto matrimonio" style="max-width: 35%; height: auto; border-radius: 10px;">
+    </div>
+  </section>
+
+  <!-- Sezione Come Arrivare -->
+  <section style="background-color: #ECEAE4; padding: 2rem 0;">
+    <div class="content-row">
+      <div class="travel-title-wrap">
+          <img src="assets/title_2.png" alt="Come raggiungerci" class="travel-title-image" />
+        </div>
+      <div class="content-image">
+        <img src="assets/etna_voli_sicilia_catania.PNG" alt="Come arrivare" />
+      </div>
+      <div class="content-text">
+        
+        <div class="details">
+          <ul class="travel-location-list">
+            <li>
+              <img src="assets/location.png" alt="" class="travel-location-icon">
+              <span class="travel-location-text"><a href="https://maps.app.goo.gl/futfLjwH7rdB85Rr5" target="_blank" rel="noopener noreferrer" class="travel-location-link">Duomo di San Pietro</a>
+              nel cuore di Modica Bassa.</span>
+            </li>
+            <li>
+              <img src="assets/location.png" alt="" class="travel-location-icon">
+              <span class="travel-location-text"><a href="https://maps.app.goo.gl/TBgtFQcqQ9b9nLo78" target="_blank" rel="noopener noreferrer" class="travel-location-link">Villa Gisana</a>
+              in zona extraurbana (Contrada Zappulla).</span>
+            </li>
+          </ul>
+
+          <div class="travel-options">
+            <p class="travel-scroll-hint">Scorri per vedere tutte le opzioni</p>
+            <div class="travel-carousel">
+              <div class="travel-cards">
+                <button class="travel-btn" data-popup="catania" type="button">
+                  <span class="travel-card-title">Aeroporto di Catania</span>
+                  <span class="travel-card-subtitle">(CTA)</span>
+                  <span class="travel-card-cta">Indicazioni</span>
+                </button>
+
+                <button class="travel-btn" data-popup="comiso" type="button">
+                  <span class="travel-card-title">Aeroporto di Comiso</span>
+                  <span class="travel-card-subtitle">(CIY)</span>
+                  <span class="travel-card-cta">Indicazioni</span>
+                </button>
+
+                <button class="travel-btn" data-popup="villa" type="button">
+                  <span class="travel-card-title">Duomo → Villa Gisana</span>
+                  <span class="travel-card-subtitle">In auto o bus</span>
+                  <span class="travel-card-cta">Indicazioni</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+
+  <!-- Popup per Catania -->
+  <div class="travel-popup" id="popup-catania">
+    <div class="popup-content">
+      <button class="close-btn">&times;</button>
+      <h3>Dall'Aeroporto di Catania (CTA)</h3>
+      <div class="transport-option">
+        <h4>🚌 In Autobus:</h4>
+        <p>La compagnia <strong><a href="http://www.astsicilia.it/" target="_blank" rel="noopener noreferrer" class="travel-location-link">AST</a></strong> effettua collegamenti diretti. La durata è di circa <strong>2h</strong>. Scendi alla fermata di Modica (solitamente in Piazza Borsellino). Da lì,
+          il Duomo è raggiungibile con una breve passeggiata o con un bus urbano verso il centro.</p>
+      </div>
+      <div class="transport-option">
+        <h4>🚗 In Auto (Consigliato):</h4>
+        <p>Prendi l'autostrada <strong>A18 (Catania-Siracusa-Gela)</strong> in direzione Siracusa/Gela. (Non
+          preoccupatevi, le autostrade in Sicilia non si pagano!). Segui <strong>E45 fino a Modica</strong>. Una volta
+          arrivato, il Duomo si trova sul <strong>Corso Umberto I</strong>.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Popup per Comiso -->
+  <div class="travel-popup" id="popup-comiso">
+    <div class="popup-content">
+      <button class="close-btn">&times;</button>
+      <h3>Dall'Aeroporto di Comiso (CIY)</h3>
+      <div class="transport-option">
+        <h4>🚌 In Autobus:</h4>
+        <p>Esistono navette e bus (compagnia <strong><a href="http://www.astsicilia.it/" target="_blank" rel="noopener noreferrer" class="travel-location-link">AST</a></strong> o servizi navetta stagionali) che collegano
+          l'aeroporto a Modica in circa <strong>45-60 minuti</strong>.</p>
+      </div>
+      <div class="transport-option">
+        <h4>🚗 In Auto:</h4>
+        <p>È il tragitto più veloce (circa <strong>35-40 minuti</strong>). Esci dall'aeroporto seguendo le indicazioni
+          per la <strong>SP5</strong> e poi la <strong>SS115</strong> in direzione Modica.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Popup per Villa -->
+  <div class="travel-popup" id="popup-villa">
+    <div class="popup-content">
+      <button class="close-btn">&times;</button>
+      <h3>Dal Duomo di San Pietro a Villa Gisana</h3>
+      <p><strong>Villa Gisana dei Principi Grimaldi</strong> si trova in Contrada Zappulla, a circa <strong>7-8
+          km</strong> dal centro storico di Modica.</p>
+      <div class="transport-option">
+        <h4>🚗 In Auto (Circa 15 minuti):</h4>
+        <p>Dal Duomo di San Pietro, procedi lungo <strong>Corso Umberto I</strong> in direzione sud (uscendo da Modica
+          Bassa verso il Polo Commerciale). Prosegui dritto immettendoti sulla <strong>SS115</strong>. Una volta
+          superata la zona commerciale di Modica, segui le indicazioni per <strong>Contrada Zappulla</strong> o per la
+          strada che porta verso Pozzallo/Marina di Modica.</p>
+      </div>
+      <div class="transport-option">
+        <h4>🚌 In Bus:</h4>
+        <p>Se scegli questa opzione, <strong>facci sapere</strong> così organizziamo un solo pullman per tutti! 🙂</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Popup segreto Dress Code -->
+  <div class="travel-popup" id="popup-pepao">
+    <div class="popup-content secret-popup-content">
+      <button class="close-btn" aria-label="Chiudi popup">&times;</button>
+      <img src="assets/pepano.jpeg" alt="Pepao" class="secret-popup-image">
+    </div>
+  </div>
+
+  <!-- Popup segreto carousel -->
+  <div class="travel-popup" id="popup-bedo">
+    <div class="popup-content secret-popup-content">
+      <button class="close-btn" aria-label="Chiudi popup">&times;</button>
+      <img src="assets/bedo.jpeg" alt="Bedo" class="secret-popup-image">
+    </div>
+  </div>
+
+
+  <nav class="page-navigation">
+    <div class="contact-info">
+      <div class="contact-card">
+        <p><strong>Andre</strong></p>
+                <p>
+          <img src="assets/phone.png" alt="Telefono" style="width: 1em; vertical-align: middle; margin-right: 6px;">
+          +39 3346577262
+        </p>
+        <p>
+          <img src="assets/email.png" alt="Email" style="width: 1em; vertical-align: middle; margin-right: 6px;">
+          aballabio@gmail.com
+        </p>
+      </div>
+      <div class="contact-card">
+        <p><strong>Glo</strong></p>
+        <p>
+          <img src="assets/phone.png" alt="Telefono" style="width: 1em; vertical-align: middle; margin-right: 6px;">
+          +39 3371616319
+        </p>
+        <p>
+          <img src="assets/email.png" alt="Email" style="width: 1em; vertical-align: middle; margin-right: 6px;">
+          gloria.farinella@hotmail.it
+        </p>
+      </div>
+    </div>
+    <div class="rsvp-actions">
+      <img src="assets/qr.png" alt="QR RSVP" class="rsvp-qr" />
+      <a href="https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=DQSIkWdsW0yxEjajBLZtrQAAAAAAAAAAAAZ__qW3WSpUMUROTkVKR0hIWUU1V0JBM0g5V1c2VVYzMy4u" class="nav-link rsvp-btn">RSVP</a>
+    </div>
+  </nav>
+
+  <script src="js/main.js"></script>
+  <script>
+    const travelButtons = document.querySelectorAll('.travel-btn');
+    const travelPopups = document.querySelectorAll('.travel-popup');
+    const closeButtons = document.querySelectorAll('.close-btn');
+    const travelCarousel = document.querySelector('.travel-carousel');
+    const dressCodeImage = document.getElementById('dressCodeImage');
+    const dressCodeTitle = document.getElementById('dressCodeTitle');
+    const dressCodeSubtitle = document.getElementById('dressCodeSubtitle');
+    const pepaoPopup = document.getElementById('popup-pepao');
+    const bedoPopup = document.getElementById('popup-bedo');
+    const isTouchDevice = window.matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window;
+
+    let dressClickCount = 0;
+    let dressClickTimer;
+    let dressSecretIndex = 0;
+    let dressSecretResetTimer;
+    let carouselLastScrollLeft = travelCarousel ? travelCarousel.scrollLeft : 0;
+    let carouselLastDirection = null;
+    let carouselPatternIndex = 0;
+    let carouselPatternCycles = 0;
+    let carouselPatternResetTimer;
+    const carouselPattern = ['R', 'L', 'R', 'L'];
+
+    travelButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const popupId = 'popup-' + btn.dataset.popup;
+        const popup = document.getElementById(popupId);
+        if (popup) {
+          popup.classList.add('show');
+        }
+      });
+    });
+
+    closeButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const popup = btn.closest('.travel-popup');
+        if (popup) {
+          popup.classList.remove('show');
+        }
+      });
+    });
+
+    travelPopups.forEach(popup => {
+      popup.addEventListener('click', (e) => {
+        if (e.target === popup) {
+          popup.classList.remove('show');
+        }
+      });
+    });
+
+    if (dressCodeImage && pepaoPopup) {
+      if (isTouchDevice) {
+        const dressSecretSequence = ['title', 'subtitle', 'image'];
+        const resetDressSecretSequence = () => {
+          dressSecretIndex = 0;
+          clearTimeout(dressSecretResetTimer);
+        };
+
+        const handleDressSecretTap = (step) => {
+          const expectedStep = dressSecretSequence[dressSecretIndex];
+
+          if (step === expectedStep) {
+            dressSecretIndex += 1;
+
+            if (dressSecretIndex === dressSecretSequence.length) {
+              pepaoPopup.classList.add('show');
+              resetDressSecretSequence();
+              return;
+            }
+          } else {
+            dressSecretIndex = step === dressSecretSequence[0] ? 1 : 0;
+          }
+
+          clearTimeout(dressSecretResetTimer);
+          dressSecretResetTimer = setTimeout(() => {
+            dressSecretIndex = 0;
+          }, 1800);
+        };
+
+        dressCodeTitle?.addEventListener('click', () => handleDressSecretTap('title'));
+        dressCodeSubtitle?.addEventListener('click', () => handleDressSecretTap('subtitle'));
+        dressCodeImage.addEventListener('click', () => handleDressSecretTap('image'));
+      } else {
+        dressCodeImage.addEventListener('click', () => {
+          dressClickCount += 1;
+          clearTimeout(dressClickTimer);
+
+          if (dressClickCount === 3) {
+            pepaoPopup.classList.add('show');
+            dressClickCount = 0;
+            return;
+          }
+
+          dressClickTimer = setTimeout(() => {
+            dressClickCount = 0;
+          }, 1100);
+        });
+      }
+    }
+
+    if (travelCarousel && bedoPopup) {
+      travelCarousel.addEventListener('scroll', () => {
+        const currentScrollLeft = travelCarousel.scrollLeft;
+        const delta = currentScrollLeft - carouselLastScrollLeft;
+        carouselLastScrollLeft = currentScrollLeft;
+
+        if (Math.abs(delta) < 12) {
+          return;
+        }
+
+        const currentDirection = delta > 0 ? 'R' : 'L';
+        if (currentDirection === carouselLastDirection) {
+          return;
+        }
+
+        carouselLastDirection = currentDirection;
+        clearTimeout(carouselPatternResetTimer);
+
+        const expectedDirection = carouselPattern[carouselPatternIndex];
+        if (currentDirection === expectedDirection) {
+          carouselPatternIndex += 1;
+
+          if (carouselPatternIndex === carouselPattern.length) {
+            carouselPatternCycles += 1;
+            carouselPatternIndex = 0;
+
+            if (carouselPatternCycles === 2) {
+              bedoPopup.classList.add('show');
+              carouselPatternCycles = 0;
+              carouselPatternIndex = 0;
+              carouselLastDirection = null;
+              return;
+            }
+          }
+        } else {
+          carouselPatternCycles = 0;
+          carouselPatternIndex = currentDirection === carouselPattern[0] ? 1 : 0;
+        }
+
+        carouselPatternResetTimer = setTimeout(() => {
+          carouselPatternCycles = 0;
+          carouselPatternIndex = 0;
+          carouselLastDirection = null;
+        }, 1700);
+      });
+    }
+  </script>
+
+  <!-- Overlay per transizioni pagina -->
+
+  <!-- Overlay per transizioni pagina -->
+  <div class="page-transition-overlay" id="pageTransitionOverlay"></div>
+</body>
+
+</html>
