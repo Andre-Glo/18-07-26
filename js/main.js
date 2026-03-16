@@ -127,6 +127,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // === GESTIONE VIDEO INTRO ===
   if (introVideo) {
+    introVideo.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+    });
+
+    introVideo.addEventListener('dragstart', (e) => {
+      e.preventDefault();
+    });
+
     // Rileva il browser per debug
     const browserName = navigator.userAgent.includes('Chrome') ? 'Chrome' : 
                        navigator.userAgent.includes('Edge') ? 'Edge' : 
